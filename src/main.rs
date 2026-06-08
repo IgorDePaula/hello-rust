@@ -1,35 +1,43 @@
-fn buscar_usuario(id: u32) -> Option<String> {
-    let banco = vec!["Alice", "Borodin", "Carol"];
-    banco.get(id as usize).map(|s| s.to_string())
+struct Pedido {
+    id: u32,
+    valor: f64,
 }
 
-fn dividir(a: f64, b: f64) -> Result<f64, String> {
-    if b == 0.0 {
-        Err("Divisão por zero".to_string())
-    } else {
-        Ok(a / b)
+fn buscar_pedido(id: u32) -> Option<Pedido> {
+    let pedidos = vec![
+        Pedido {
+            id: 1,
+            valor: 150.0,
+        },
+        Pedido {
+            id: 2,
+            valor: 300.0,
+        },
+    ];
+    pedidos.into_iter().find(|p| p.id == id)
+}
+
+fn aplicar_desconto(valor: f64, desconto_pct: f64) -> Result<f64, String> {
+    if desconto_pct >= 100.0 {
+        return Err(format!("erro: desconto inválido"));
+    }
+    Ok(valor * (1.0 - desconto_pct / 100.0))
+}
+
+fn processar_pedido(id: u32, desconto_pct: f64) -> String {
+    let pedido = match buscar_pedido(id) {
+        Some(p) => p,
+        None    => return "erro: pedido não encontrado".to_string(),
+    };
+
+    match aplicar_desconto(pedido.valor, desconto_pct) {
+        Ok(total) => format!("total com desconto: {:.2}", total),
+        Err(e)    => e,
     }
 }
 
 fn main() {
-    // Jeito 1: match explícito
-    match buscar_usuario(1) {
-        Some(nome) => println!("Encontrou: {}", nome),
-        None       => println!("Não encontrou"),
-    }
-
-    // Jeito 2: if let — quando só te importa um dos casos
-    if let Some(nome) = buscar_usuario(0) {
-        println!("Usuário: {}", nome);
-    }
-
-    // Jeito 3: unwrap_or — valor padrão se for None
-    let nome = buscar_usuario(99).unwrap_or("Anônimo".to_string());
-    println!("{}", nome);
-
-    // Result na prática
-    match dividir(10.0, 3.0) {
-        Ok(resultado) => println!("Resultado: {:.2}", resultado),
-        Err(e)        => println!("Erro: {}", e),
-    }
+    println!("{}", processar_pedido(1, 10.0)); // sucesso: 135.0
+    println!("{}", processar_pedido(2, 110.0)); // erro: desconto inválido
+    println!("{}", processar_pedido(9, 10.0)); //
 }
