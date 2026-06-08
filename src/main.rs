@@ -21,8 +21,9 @@ fn aplicar_desconto(valor: f64, desconto_pct: f64) -> Result<f64> {
 }
 
 fn processar_pedido(id: u32, desconto_pct: f64) -> Result<String> {
-    let pedido = buscar_pedido(id).ok_or_else(|| anyhow!("no pedido found for id {}", id))?;
-    Ok(aplicar_desconto(pedido.valor, desconto_pct)?.to_string())
+    let pedido = buscar_pedido(id).ok_or_else(|| anyhow!("pedido {} não encontrado", id))?;
+    let total = aplicar_desconto(pedido.valor, desconto_pct)?;
+    Ok(format!("total: {:.2}", total))
 }
 
 fn main() {
