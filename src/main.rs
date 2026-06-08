@@ -1,14 +1,41 @@
-use anyhow::Result;  // substitui Result<T, E> — o E vira anyhow::Error
+use anyhow::{anyhow, Result};
 
-fn processar(path: &str) -> Result<i32> {
-    let conteudo = std::fs::read_to_string(path)?;  // qualquer erro é convertido automaticamente
-    let numero = conteudo.trim().parse::<i32>()?;
-    Ok(numero * 2)
+struct Pedido {
+    id: u32,
+    valor: f64,
+}
+
+fn buscar_pedido(id: u32) -> Option<Pedido> {
+    let pedidos = vec![
+        Pedido { id: 1, valor: 150.0 },
+        Pedido { id: 2, valor: 300.0 },
+    ];
+    pedidos.into_iter().find(|p| p.id == id)
+}
+
+fn aplicar_desconto(valor: f64, desconto_pct: f64) -> Result<f64> {
+    if desconto_pct >= 100.0 {
+        return Err(anyhow!("desconto inválido: {}%", desconto_pct));
+    }
+    Ok(valor * (1.0 - desconto_pct / 100.0))
+}
+
+fn processar_pedido(id: u32, desconto_pct: f64) -> Result<String> {
+    let pedido = buscar_pedido(id).ok_or_else(|| anyhow!("no pedido found for id {}", id))?;
+    Ok(aplicar_desconto(pedido.valor, desconto_pct)?.to_string())
 }
 
 fn main() {
-    match processar("dados.txt") {
-        Ok(n)  => println!("Resultado: {}", n),
-        Err(e) => println!("Erro: {}", e),  // mostra a mensagem do erro original
+    let casos = vec![
+        processar_pedido(1, 10.0),
+        processar_pedido(2, 110.0),
+        processar_pedido(9, 10.0),
+    ];
+
+    for resultado in casos {
+        match resultado {
+            Ok(s)  => println!("ok: {}", s),
+            Err(e) => println!("erro: {}", e),
+        }
     }
 }
