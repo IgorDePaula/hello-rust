@@ -9,7 +9,7 @@ enum StatusPedido {
 fn descricao(status: &StatusPedido) -> String {
     // complete o match aqui
    match status {
-       StatusPedido::Pendente => "Pedido pendente".to_string(),
+       StatusPedido::Pendente => format!("Pedido pendente"),
        StatusPedido::Processando { etapa } => format!("Pedido em processo, etapa {}", etapa),
        StatusPedido::Entregue(codigo_rastreio) => format!("Pedido entregue, código de rastreio: {}", codigo_rastreio),
        StatusPedido::Cancelado { motivo } => format!("Pedido cancelado, motivo: {}", motivo),
