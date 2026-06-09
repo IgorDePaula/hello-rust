@@ -1,48 +1,95 @@
-struct Pedido {
-    id: u32,
-    cliente: String,
-    valor: f64,
-    entregue: bool,
+trait Resumo {
+    fn autor(&self) -> String;
+    fn titulo(&self) -> String;
+
+    // implementação padrão — pode ser sobrescrita
+    fn chamariz(&self) -> String {
+        format!("{}, por {} — leia mais...", self.titulo(), self.autor())
+    }
 }
 
-fn total_pendente(pedidos: &[Pedido]) -> f64 {
-    pedidos
-        .iter()
-        .filter(|p| !p.entregue)   // só os não entregues
-        .map(|p| p.valor)          // pega só o valor
-        .sum()                     // soma tudo
+struct Artigo {
+    titulo: String,
+    autor: String,
+    conteudo: String,
+}
+impl Resumo for Artigo {
+    fn autor(&self) -> String {
+        self.autor.to_string()
+    }
+
+    fn titulo(&self) -> String {
+        self.titulo.to_string()
+    }
+
+    fn chamariz(&self) -> String {
+        format!("{}, por {} leia mais...{}", self.titulo(), self.autor(), self.conteudo)
+    }
 }
 
-fn clientes_vip(pedidos: &[Pedido], minimo: f64) -> Vec<String> {
-    let mut clientes: Vec<String> = pedidos
-        .iter()
-        .filter(|p| p.valor > minimo)
-        .map(|p| p.cliente.clone())  // precisa clonar — o Vec vai ser dono das Strings
-        .collect();
-
-    clientes.sort();                 // ordena alfabeticamente
-    clientes.dedup();                // remove consecutivos duplicados (só funciona após sort)
-    clientes
-
+struct Tweet {
+    usuario: String,
+    mensagem: String,
 }
 
-fn pedido_mais_valioso(pedidos: &[Pedido]) -> Option<u32> {
-    pedidos
-        .iter()
-        .max_by(|a, b| a.valor.partial_cmp(&b.valor).unwrap())
-        .map(|p| p.id)
+impl Resumo for Tweet {
+    fn autor(&self) -> String {
+        self.usuario.to_string()
+    }
+
+    fn titulo(&self) -> String {
+        self.mensagem.to_string()
+    }
+    fn chamariz(&self) -> String {
+        format!("{}, por {} leia mais...", self.titulo(), self.autor())
+    }
+}
+
+struct VideoAula {
+    titulo: String,
+    instrutor: String,
+    duracao_min: u32,
+}
+
+impl Resumo for VideoAula {
+    fn autor(&self) -> String {
+        self.instrutor.to_string()
+    }
+    fn titulo(&self) -> String {
+        self.titulo.to_string()
+    }
+
+    fn chamariz(&self) -> String {
+        format!("{}, por {} leia mais...com duracao {}", self.titulo(), self.autor(), self.duracao_min)
+    }
+}
+
+// implemente Resumo para os três tipos
+// VideoAula deve sobrescrever chamariz() incluindo a duração
+
+fn imprimir_resumo(item: &impl Resumo) {
+    println!("{}", item.chamariz());
 }
 
 fn main() {
-    let pedidos = vec![
-        Pedido { id: 1, cliente: "Ana".to_string(),     valor: 450.0,  entregue: false },
-        Pedido { id: 2, cliente: "Borodin".to_string(), valor: 1200.0, entregue: false },
-        Pedido { id: 3, cliente: "Ana".to_string(),     valor: 300.0,  entregue: true  },
-        Pedido { id: 4, cliente: "Carlos".to_string(),  valor: 850.0,  entregue: false },
-        Pedido { id: 5, cliente: "Borodin".to_string(), valor: 200.0,  entregue: true  },
-    ];
+    let artigo = Artigo {
+        titulo: "Ownership em Rust".to_string(),
+        autor: "Borodin".to_string(),
+        conteudo: "...".to_string(),
+    };
 
-    println!("Pendente: R${:.2}", total_pendente(&pedidos));
-    println!("VIPs: {:?}", clientes_vip(&pedidos, 400.0));
-    println!("Mais valioso: {:?}", pedido_mais_valioso(&pedidos));
+    let tweet = Tweet {
+        usuario: "borodin_dev".to_string(),
+        mensagem: "Rust é incrível!".to_string(),
+    };
+
+    let aula = VideoAula {
+        titulo: "Traits na prática".to_string(),
+        instrutor: "Borodin".to_string(),
+        duracao_min: 45,
+    };
+
+    imprimir_resumo(&artigo);
+    imprimir_resumo(&tweet);
+    imprimir_resumo(&aula);
 }
