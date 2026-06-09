@@ -1,18 +1,20 @@
+use std::collections::VecDeque;
+
 struct Fila<T> {
-    itens: Vec<T>
+    itens: VecDeque<T>
 }
 
 impl<T> Fila<T> {
     fn new() -> Self {
-        Fila { itens: vec![] }
+        Fila { itens: VecDeque::new() }
     }
 
     fn enfileirar(&mut self, item: T) {
-       self.itens.push(item);
+       self.itens.push_back(item);
     }
 
     fn desenfileirar(&mut self) -> Option<T> {
-        self.itens.pop()
+        self.itens.pop_front()
     }
 
     fn tamanho(&self) -> usize {
@@ -20,7 +22,7 @@ impl<T> Fila<T> {
     }
 
     fn esta_vazia(&self) -> bool {
-        self.tamanho() == 0
+        self.itens.is_empty()
     }
 }
 
