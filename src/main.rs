@@ -1,95 +1,43 @@
-trait Resumo {
-    fn autor(&self) -> String;
-    fn titulo(&self) -> String;
-
-    // implementação padrão — pode ser sobrescrita
-    fn chamariz(&self) -> String {
-        format!("{}, por {} — leia mais...", self.titulo(), self.autor())
-    }
+struct Fila<T> {
+    itens: Vec<T>
 }
 
-struct Artigo {
-    titulo: String,
-    autor: String,
-    conteudo: String,
-}
-impl Resumo for Artigo {
-    fn autor(&self) -> String {
-        self.autor.to_string()
+impl<T> Fila<T> {
+    fn new() -> Self {
+        Fila { itens: vec![] }
     }
 
-    fn titulo(&self) -> String {
-        self.titulo.to_string()
+    fn enfileirar(&mut self, item: T) {
+       self.itens.push(item);
     }
 
-    fn chamariz(&self) -> String {
-        format!("{}, por {} leia mais...{}", self.titulo(), self.autor(), self.conteudo)
-    }
-}
-
-struct Tweet {
-    usuario: String,
-    mensagem: String,
-}
-
-impl Resumo for Tweet {
-    fn autor(&self) -> String {
-        self.usuario.to_string()
+    fn desenfileirar(&mut self) -> Option<T> {
+        self.itens.pop()
     }
 
-    fn titulo(&self) -> String {
-        self.mensagem.to_string()
-    }
-    fn chamariz(&self) -> String {
-        format!("{}, por {} leia mais...", self.titulo(), self.autor())
-    }
-}
-
-struct VideoAula {
-    titulo: String,
-    instrutor: String,
-    duracao_min: u32,
-}
-
-impl Resumo for VideoAula {
-    fn autor(&self) -> String {
-        self.instrutor.to_string()
-    }
-    fn titulo(&self) -> String {
-        self.titulo.to_string()
+    fn tamanho(&self) -> usize {
+        self.itens.len()
     }
 
-    fn chamariz(&self) -> String {
-        format!("{}, por {} leia mais...com duracao {}", self.titulo(), self.autor(), self.duracao_min)
+    fn esta_vazia(&self) -> bool {
+        self.tamanho() == 0
     }
-}
-
-// implemente Resumo para os três tipos
-// VideoAula deve sobrescrever chamariz() incluindo a duração
-
-fn imprimir_resumo(item: &impl Resumo) {
-    println!("{}", item.chamariz());
 }
 
 fn main() {
-    let artigo = Artigo {
-        titulo: "Ownership em Rust".to_string(),
-        autor: "Borodin".to_string(),
-        conteudo: "...".to_string(),
-    };
+    // teste com i32
+    let mut fila_nums: Fila<i32> = Fila::new();
+    fila_nums.enfileirar(10);
+    fila_nums.enfileirar(20);
+    fila_nums.enfileirar(30);
+    println!("Tamanho: {}", fila_nums.tamanho());
+    println!("Removeu: {:?}", fila_nums.desenfileirar());
+    println!("Removeu: {:?}", fila_nums.desenfileirar());
+    println!("Vazia: {}", fila_nums.esta_vazia());
 
-    let tweet = Tweet {
-        usuario: "borodin_dev".to_string(),
-        mensagem: "Rust é incrível!".to_string(),
-    };
-
-    let aula = VideoAula {
-        titulo: "Traits na prática".to_string(),
-        instrutor: "Borodin".to_string(),
-        duracao_min: 45,
-    };
-
-    imprimir_resumo(&artigo);
-    imprimir_resumo(&tweet);
-    imprimir_resumo(&aula);
+    // teste com String
+    let mut fila_nomes: Fila<String> = Fila::new();
+    fila_nomes.enfileirar("Ana".to_string());
+    fila_nomes.enfileirar("Borodin".to_string());
+    println!("Primeiro: {:?}", fila_nomes.desenfileirar());
 }
