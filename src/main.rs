@@ -1,16 +1,25 @@
-use tokio::time::{sleep, Duration};
+use serde::Deserialize;
+
+#[derive(Deserialize, Debug)]
+struct Post {
+    id: u32,
+    title: String,
+    body: String,
+}
+
+async fn buscar_post(id: u32) -> Result<Post, reqwest::Error> {
+    let url = format!("https://jsonplaceholder.typicode.com/posts/{}", id);
+    let post = reqwest::get(&url)
+        .await?           // aguarda a requisição
+        .json::<Post>()
+        .await?;          // aguarda o parse do JSON
+    Ok(post)
+}
 
 #[tokio::main]
 async fn main() {
-    // spawn lança a tarefa no background — não bloqueia
-    let handle = tokio::spawn(async {
-        sleep(Duration::from_secs(1)).await;
-        42  // valor de retorno
-    });
-
-    println!("Continuou executando enquanto a tarefa roda");
-
-    // espera terminar e pega o resultado — equivale ao WaitGroup + channel do Go
-    let resultado = handle.await.unwrap();
-    println!("Tarefa retornou: {}", resultado);
+    match buscar_post(3).await {
+        Ok(post)  => println!("#{}: {}, {}", post.id, post.title, post.body),
+        Err(e)    => println!("Erro: {}", e),
+    }
 }
