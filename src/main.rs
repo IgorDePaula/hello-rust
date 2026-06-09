@@ -18,8 +18,22 @@ async fn buscar_post(id: u32) -> Result<Post, reqwest::Error> {
 
 #[tokio::main]
 async fn main() {
-    match buscar_post(3).await {
-        Ok(post)  => println!("#{}: {}, {}", post.id, post.title, post.body),
-        Err(e)    => println!("Erro: {}", e),
+    // sequencial — faz uma de cada vez
+    for id in 1..=3 {
+        let post = buscar_post(id).await.unwrap();
+        println!("{}: {}", post.id, post.title);
+    }
+
+    // paralelo — dispara todas ao mesmo tempo
+    // equivale a goroutines + WaitGroup + channel no Go
+    let handles: Vec<_> = (1..=3)
+        .map(|id| tokio::spawn(buscar_post(id)))
+        .collect();
+
+    for handle in handles {
+        match handle.await.unwrap() {
+            Ok(post)  => println!("{}: {}, {}", post.id, post.title, post.body),
+            Err(e)    => println!("Erro: {}", e),
+        }
     }
 }
