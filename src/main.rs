@@ -1,9 +1,9 @@
+fn criar_saudador(nome: String) -> impl Fn() -> String {
+    move || format!("Olá, {}!", nome)  // move captura `nome` por ownership
+}
+
 fn main() {
-    let taxa = 0.1;  // variável no escopo externo
-
-    // captura `taxa` automaticamente por referência
-    let calcular_frete = |preco: f64| preco * taxa;
-
-    println!("{}", calcular_frete(100.0));  // 10.0
-    println!("{}", calcular_frete(250.0));  // 25.0
+    let saudar = criar_saudador("Borodin".to_string());
+    println!("{}", saudar());  // "Olá, Borodin!"
+    println!("{}", saudar());  // pode chamar várias vezes
 }
