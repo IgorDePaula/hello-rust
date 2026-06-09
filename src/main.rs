@@ -1,17 +1,12 @@
-fn tamanho(s: &String) -> usize {
-    s.len()
-}
-
-fn adicionar_saudacao(s: &String) -> String {
-    format!("Olá, {}!", s)
+fn primeira_palavra<'a>(s: &str) -> &str {
+    s.split_whitespace().next().unwrap_or("")
 }
 
 fn main() {
-    let nome = String::from("Borodin");
+    let resultado;
 
-    let tam = tamanho(&nome);
-    let saudacao = adicionar_saudacao(&nome);
+        let frase = String::from("ownership é poderoso").to_string();
+        resultado = primeira_palavra(&frase);
 
-    println!("Nome tem {} caracteres", tam);
-    println!("{}", saudacao);
+    println!("{}", resultado);
 }
