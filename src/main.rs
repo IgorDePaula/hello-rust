@@ -1,12 +1,22 @@
-fn primeira_palavra<'a>(s: &str) -> &str {
-    s.split_whitespace().next().unwrap_or("")
-}
-
 fn main() {
-    let resultado;
+    let nomes = vec!["Alice", "Bob", "Carol"];
 
-        let frase = String::from("ownership é poderoso").to_string();
-        resultado = primeira_palavra(&frase);
+    // iter() — empresta (&T), o vec continua existindo depois
+    for nome in nomes.iter() {
+        println!("{}", nome);  // nome é &&str aqui
+    }
+    println!("{:?}", nomes);  // ok — nomes ainda existe
 
-    println!("{}", resultado);
+    // into_iter() — move (T), o vec é consumido
+    for nome in nomes.into_iter() {
+        println!("{}", nome);  // nome é &str
+    }
+    // println!("{:?}", nomes);  // ERRO — nomes foi movido
+
+    // iter_mut() — empresta mutável (&mut T)
+    let mut valores = vec![1, 2, 3];
+    for v in valores.iter_mut() {
+        *v *= 2;  // modifica in-place
+    }
+    println!("{:?}", valores);  // [2, 4, 6]
 }
